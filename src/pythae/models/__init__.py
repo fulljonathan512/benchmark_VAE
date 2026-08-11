@@ -42,8 +42,11 @@ from .vae_lin_nf import VAE_LinNF, VAE_LinNF_Config
 from .vamp import VAMP, VAMPConfig
 from .vq_vae import VQVAE, VQVAEConfig
 from .wae_mmd import WAE_MMD, WAE_MMD_Config
+from .dvae import DVAE, DVAEConfig
 
 __all__ = [
+    "DVAE",
+    "DVAEConfig",
     "AutoModel",
     "BaseAE",
     "BaseAEConfig",

@@ -36,6 +36,7 @@ ap.add_argument(
     "--model_name",
     help="The name of the model to train",
     choices=[
+        "dvae",
         "ae",
         "vae",
         "beta_vae",
@@ -279,6 +280,23 @@ def main(args):
         model = AE(
             model_config=model_config,
             encoder=Encoder_AE(model_config),
+            decoder=Decoder_AE(model_config),
+        )
+
+    elif args.model_name == "dvae":
+        from pythae.models import DVAE, DVAEConfig
+
+        if args.model_config is not None:
+            model_config = DVAEConfig.from_json_file(args.model_config)
+
+        else:
+            model_config = DVAEConfig()
+
+        model_config.input_dim = data_input_dim
+
+        model = DVAE(
+            model_config=model_config,
+            encoder=Encoder_VAE(model_config),
             decoder=Decoder_AE(model_config),
         )
 
