@@ -123,13 +123,18 @@ class DVAE(BaseAE):
         # Sample N(0, I)
         # eps = torch.randn_like(std)
         # under estimation std is the covarianz-matrix
-        dim = std.size(0)
-        covr = std.unsqueeze(-1).repeat(1,1,dim)
-        covr = covr * covr.transpose(2,1)
-        approx = np.zeros((numberOfDiracMixture, mu.size(0)))
-        g2d = deterministic_gaussian_sampling.GaussianToDiracApproximation(covr, mu.size(0), numberOfDiracMixture, approx)
-        del g2d
-        return mu.repeat(1,numberOfDiracMixture,1) + approx, std
+        a = torch.tensor(())
+        for t in std:
+          covr = torch.diag(t)
+          approx = np.zeros((numberOfDiracMixture, mu.size(0)))
+          g2d = deterministic_gaussian_sampling.GaussianToDiracApproximation()
+          g2d.approximate_double(covr.numpy(), numberOfDiracMixture, mu.size(0), approx)
+          del g2d
+          a = torch.cat((a,torch.from_numpy(approx)),0)
+
+        mu = torch.repeat_interleave(mu,repeats=numberOfDiracMixture,dim=0)
+
+        return mu + a, std
 
     def get_nll(self, data, n_samples=1, batch_size=100):
         """
@@ -163,7 +168,7 @@ class DVAE(BaseAE):
                 mu, log_var = encoder_output.embedding, encoder_output.log_covariance
 
                 std = torch.exp(0.5 * log_var)
-                z, _ = self._sample_deterministic_gauss(mu, std)
+                z, _ = self._sample_deterministic_gauss(mu, std,1)
 
                 log_q_z_given_x = -0.5 * (
                     log_var + (z - mu) ** 2 / torch.exp(log_var)
