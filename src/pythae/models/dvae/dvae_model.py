@@ -126,15 +126,17 @@ class DVAE(BaseAE):
         a = torch.tensor(())
         for t in std:
           covr = torch.diag(t)
-          approx = np.zeros((numberOfDiracMixture, mu.size(0)))
+          numpyCovr = covr.cpu().detach().numpy()
+          approx = np.zeros((numberOfDiracMixture, mu.size(dim=1)))
           g2d = deterministic_gaussian_sampling.GaussianToDiracApproximation()
-          g2d.approximate_double(covr.numpy(), numberOfDiracMixture, mu.size(0), approx)
+          g2d.approximate_double(numpyCovr, numberOfDiracMixture, mu.size(dim = 1), approx)
           del g2d
           a = torch.cat((a,torch.from_numpy(approx)),0)
 
         mu = torch.repeat_interleave(mu,repeats=numberOfDiracMixture,dim=0)
+        b = a.cuda()
 
-        return mu + a, std
+        return (mu + b).float(), std
 
     def get_nll(self, data, n_samples=1, batch_size=100):
         """
