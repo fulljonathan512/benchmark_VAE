@@ -82,12 +82,12 @@ class DVAE_Matrix(BaseAE):
         # log_tri_cov L: Covariance-matrix C = exp(L)*exp(L^T) in flatten version
         mu, log_tri_cov = encoder_output.embedding, encoder_output.tri_cov
         
-        numberDiracMixture = 2
-        z, cov, tri_cov = self._sample_deterministic_gauss(mu, log_tri_cov, numberDiracMixture) # third parameter with number of dirac-mixture points
+        dirac_mixture_points = 2
+        z, cov, tri_cov = self._sample_deterministic_gauss(mu, log_tri_cov, dirac_mixture_points) # third parameter with number of dirac-mixture points
         recon_x = self.decoder(z)["reconstruction"] # higher dimensional dependent on number of dirac-mixture points
 
         
-        loss, recon_loss, kld = self.loss_function(recon_x, x, mu, cov, tri_cov , z, numberDiracMixture)
+        loss, recon_loss, kld = self.loss_function(recon_x, x, mu, cov, tri_cov , z, dirac_mixture_points)
 
         output = ModelOutput(
             recon_loss=recon_loss,
@@ -99,8 +99,8 @@ class DVAE_Matrix(BaseAE):
 
         return output
 
-    def loss_function(self, recon_x, x, mu, cov, tri_cov, z, diracMixturePoints):
-        x = x.repeat_interleave(diracMixturePoints,dim=0)
+    def loss_function(self, recon_x, x, mu, cov, tri_cov, z, dirac_mixture_points):
+        x = x.repeat_interleave(dirac_mixture_points,dim=0)
         if self.model_config.reconstruction_loss == "mse":
             recon_loss = 0.5 * F.mse_loss(
                 recon_x.reshape(x.shape[0], -1),
@@ -114,7 +114,7 @@ class DVAE_Matrix(BaseAE):
                 x.reshape(x.shape[0], -1),
                 reduction="none",
             ).sum(dim=-1)
-        KLD = (-0.5 * torch.sum(-torch.diagonal(cov, dim1=1, dim2=2) + 1 - mu.pow(2) + torch.log(torch.square(torch.diagonal(tri_cov, dim1=1, dim2=2))), dim=-1)).repeat_interleave(diracMixturePoints, dim=0)
+        KLD = (-0.5 * torch.sum(-torch.diagonal(cov, dim1=1, dim2=2) + 1 - mu.pow(2) + torch.log(torch.square(torch.diagonal(tri_cov, dim1=1, dim2=2))), dim=-1)).repeat_interleave(dirac_mixture_points, dim=0)
         
         return (recon_loss + KLD).mean(dim=0), recon_loss.mean(dim=0), KLD.mean(dim=0)
 
