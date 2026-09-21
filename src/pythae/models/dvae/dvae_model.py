@@ -81,12 +81,12 @@ class DVAE(BaseAE):
 
         mu, log_var = encoder_output.embedding, encoder_output.log_covariance
 
-        std = torch.exp(0.5 * log_var) # what kind of structure has the log_var? calculate covarianz-matrix
-        numberDiracMixture = 1
-        z, _ = self._sample_deterministic_gauss(mu, std, numberDiracMixture) # third parameter with number of dirac-mixture points
+        std = torch.exp(log_var) # what kind of structure has the log_var? calculate covarianz-matrix
+        dirac_mixture_points = 2
+        z, _ = self._sample_deterministic_gauss(mu, std, dirac_mixture_points) # third parameter with number of dirac-mixture points
         recon_x = self.decoder(z)["reconstruction"] # higher dimensional dependent on number of dirac-mixture points
 
-        loss, recon_loss, kld = self.loss_function(recon_x, x, mu, log_var, z)
+        loss, recon_loss, kld = self.loss_function(recon_x, x, mu, log_var, z, dirac_mixture_points)
 
         output = ModelOutput(
             recon_loss=recon_loss,
@@ -98,7 +98,8 @@ class DVAE(BaseAE):
 
         return output
 
-    def loss_function(self, recon_x, x, mu, log_var, z):
+    def loss_function(self, recon_x, x, mu, log_var, z, dirac_mixture_points):
+        x = x.repeat_interleave(dirac_mixture_points,dim=0)
         if self.model_config.reconstruction_loss == "mse":
             recon_loss = 0.5 * F.mse_loss(
                 recon_x.reshape(x.shape[0], -1),
@@ -113,16 +114,11 @@ class DVAE(BaseAE):
                 reduction="none",
             ).sum(dim=-1)
 
-        KLD = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp(), dim=-1)
+        KLD = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp(), dim=-1).repeat_interleave(dirac_mixture_points, dim=0)
 
         return (recon_loss + KLD).mean(dim=0), recon_loss.mean(dim=0), KLD.mean(dim=0)
 
-    def _sample_deterministic_gauss(self, mu, std, numberOfDiracMixture): # third parameter with number of dirac-mixture points
-        
-        # Reparametrization trick
-        # Sample N(0, I)
-        # eps = torch.randn_like(std)
-        # under estimation std is the covarianz-matrix
+    def _sample_deterministic_gauss(self, mu, std, numberOfDiracMixture):
         a = torch.tensor(())
         for t in std:
           covr = torch.diag(t)
