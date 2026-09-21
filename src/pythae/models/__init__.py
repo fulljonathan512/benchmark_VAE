@@ -43,11 +43,11 @@ from .vamp import VAMP, VAMPConfig
 from .vq_vae import VQVAE, VQVAEConfig
 from .wae_mmd import WAE_MMD, WAE_MMD_Config
 from .dvae import DVAE, DVAEConfig
-from .dvae_matrix import DVAE_Matrix, DVAE_MatrixConfig
+from .fcdvae import FCDVAE, FCDVAEConfig
 
 __all__ = [
-    "DVAE_Matrix",
-    "DVAE_MatrixConfig"
+    "FCDVAE",
+    "FCDVAEConfig"
     "DVAE",
     "DVAEConfig",
     "AutoModel",

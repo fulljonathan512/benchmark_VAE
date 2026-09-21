@@ -13,7 +13,7 @@ Available samplers
     :nosignatures:
 """
 
-from .dvae_matrix_config import DVAE_MatrixConfig
-from .dvae_matrix_model import DVAE_Matrix
+from .fcdvae_config import FCDVAEConfig
+from .fcdvae_model import FCDVAE
 
-__all__ = ["DVAE_Matrix", "DVAE_MatrixConfig"]
+__all__ = ["FCDVAE", "FCDVAEConfig"]

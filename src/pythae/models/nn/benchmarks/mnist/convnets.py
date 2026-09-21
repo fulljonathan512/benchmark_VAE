@@ -754,7 +754,7 @@ class Discriminator_Conv_MNIST(BaseDiscriminator):
 
         return output
 
-class Encoder_Conv_DVAE_Matrix_MNIST(BaseEncoder):
+class Encoder_Conv_FCDVAE_MNIST(BaseEncoder):
     """
     A Convolutional encoder suited for MNIST and Variational Autoencoder-based
     models.

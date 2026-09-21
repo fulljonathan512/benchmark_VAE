@@ -36,7 +36,7 @@ ap.add_argument(
     "--model_name",
     help="The name of the model to train",
     choices=[
-        "dvae_matrix",
+        "fcdvae",
         "dvae",
         "ae",
         "vae",
@@ -121,6 +121,9 @@ def main(args):
             )
             from pythae.models.nn.benchmarks.mnist import (
                 Encoder_Conv_VAE_MNIST as Encoder_VAE,
+            )
+            from pythae.models.nn.benchmarks.mnist import (
+                Encoder_Conv_FCDVAE_MNIST as Encoder_FCDVAE,
             )
 
         elif args.nn == "resnet":
@@ -301,20 +304,19 @@ def main(args):
             decoder=Decoder_AE(model_config),
         )
 
-    elif args.model_name == "dvae_matrix":
-            from pythae.models import DVAE_Matrix, DVAE_MatrixConfig
-            from pythae.models.nn.benchmarks.mnist import Encoder_Conv_DVAE_Matrix_MNIST
+    elif args.model_name == "fcdvae":
+            from pythae.models import FCDVAE, FCDVAEConfig
             if args.model_config is not None:
-                model_config = DVAE_MatrixConfig.from_json_file(args.model_config)
+                model_config = FCDVAEConfig.from_json_file(args.model_config)
     
             else:
-                model_config = DVAE_MatrixConfig()
+                model_config = FCDVAEConfig()
     
             model_config.input_dim = data_input_dim
     
-            model = DVAE_Matrix(
+            model = FCDVAE(
                 model_config=model_config,
-                encoder=Encoder_Conv_DVAE_Matrix_MNIST(model_config),
+                encoder=Encoder_FCDVAE(model_config),
                 decoder=Decoder_AE(model_config),
             )
 

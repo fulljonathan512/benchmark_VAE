@@ -11,10 +11,10 @@ from ..base import BaseAE
 from ..base.base_utils import ModelOutput
 from ..nn import BaseDecoder, BaseEncoder
 from ..nn.default_architectures import Encoder_DVAE_MATRIX_MLP
-from .dvae_matrix_config import DVAE_MatrixConfig
+from .fcdvae_config import FCDVAEConfig
 
 
-class DVAE_Matrix(BaseAE):
+class FCDVAE(BaseAE):
     """Vanilla Variational Autoencoder model.
 
     Args:
@@ -38,7 +38,7 @@ class DVAE_Matrix(BaseAE):
 
     def __init__(
         self,
-        model_config: DVAE_MatrixConfig,
+        model_config: FCDVAEConfig,
         encoder: Optional[BaseEncoder] = None,
         decoder: Optional[BaseDecoder] = None,
     ):

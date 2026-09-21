@@ -5,8 +5,8 @@ from ..base.base_config import BaseAEConfig
 
 
 @dataclass
-class DVAE_MatrixConfig(BaseAEConfig):
-    """DVAE_matrix config class.
+class FCDVAEConfig(BaseAEConfig):
+    """FCDVAE config class.
 
     Parameters:
         input_dim (tuple): The input_data dimension.
