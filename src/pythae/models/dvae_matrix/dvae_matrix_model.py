@@ -101,72 +101,31 @@ class DVAE_Matrix(BaseAE):
 
     def loss_function(self, recon_x, x, mu, cov, tri_cov, z, diracMixturePoints):
         x = x.repeat_interleave(diracMixturePoints,dim=0)
-        # print("recon")
-        # print(recon_x)
-        # print("dim of recon")
-        # print(recon_x.shape)
-        # print("reshaped recon")
-        # print(recon_x.reshape(x.shape[0], -1))
-        # print("x")
-        # print(x)
-        # print("dim of x")
-        # print(x.shape)
-        # print("reshaped x")
-        # print(x.repeat_interleave(diracMixturePoints, dim=0))
         if self.model_config.reconstruction_loss == "mse":
             recon_loss = 0.5 * F.mse_loss(
                 recon_x.reshape(x.shape[0], -1),
-                x.reshape(x.shape[0], -1), #repeat  number of dirac-mixture points0
+                x.reshape(x.shape[0], -1),
                 reduction="none",
             ).sum(dim=-1)
 
         elif self.model_config.reconstruction_loss == "bce":
             recon_loss = F.binary_cross_entropy(
                 recon_x.reshape(x.shape[0], -1),
-                x.reshape(x.shape[0], -1), #repeat  number of dirac-mixture points0
+                x.reshape(x.shape[0], -1),
                 reduction="none",
             ).sum(dim=-1)
-        # print("ln Kovarianz")
-        # print(cov)
-        # print(torch.diagonal(cov, dim1=1,dim2=2))
-        # print(torch.log(torch.diagonal(cov, dim1=1,dim2=2)))
-        # print(torch.sum(torch.log(torch.diagonal(cov, dim1=1,dim2=2))))
-        # print("Mittelwerte:")
-        # print(mu)
-        # print("Cholesky-Zerlegung")
-        # print(tri_cov)
-        # print("diagonal")
-        # print(torch.diagonal(tri_cov, dim1=1, dim2=2))
-        # print("Quadrat")
-        # print(torch.square(torch.diagonal(tri_cov, dim1=1, dim2=2)))
-        # print("ln")
-        # print(torch.log(torch.square(torch.diagonal(tri_cov, dim1=1, dim2=2))))
-        # print("sum")
-        # print(torch.sum(torch.log(torch.square(torch.diagonal(tri_cov, dim1=1, dim2=2))),dim=-1))
-        # # print(torch.sum(torch.log(torch.square(torch.diag(tri_cov))),dim=-1))
-        # print("Spur")
-        # print(torch.sum(torch.diagonal(cov, dim1=1, dim2=2), dim=-1))
-        # aufgrund des Batches wird bei torch.diag nur einmal die tri_cov vom ersten batch berücksichtig
         KLD = (-0.5 * torch.sum(-torch.diagonal(cov, dim1=1, dim2=2) + 1 - mu.pow(2) + torch.log(torch.square(torch.diagonal(tri_cov, dim1=1, dim2=2))), dim=-1)).repeat_interleave(diracMixturePoints, dim=0)
-        # return 0
-        # print(KLD)
-
-        # return 0
+        
         return (recon_loss + KLD).mean(dim=0), recon_loss.mean(dim=0), KLD.mean(dim=0)
 
     def _sample_deterministic_gauss(self, mu, log_tri_cov, numberOfDiracMixture): # third parameter with number of dirac-mixture points
-        
-        # Reparametrization trick
-        # Sample N(0, I)
-        # eps = torch.randn_like(std)
-        # under estimation std is the covarianz-matrix
         a = torch.tensor(())
         covs = []
         tri_covs = []
         for t in log_tri_cov:
           dim = mu.size(dim=1)
           tri_cov = torch.zeros((dim,dim))
-          size = tri_cov.size(0)  # assuming cov is a 2D tensor (matrix)
+          size = tri_cov.size(0)
           indices = torch.tril_indices(row=size, col=size)
           indices = indices.to(tri_cov.device)
           t = torch.exp(t)
