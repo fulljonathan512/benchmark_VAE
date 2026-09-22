@@ -1,0 +1,7 @@
+{
+    "name": "FCDVAEConfig",
+    "latent_dim": 2,
+    "reconstruction_loss": "mse",
+    "gaussian_approximation": "lcd",
+    "number_gaussian_points": 4
+}

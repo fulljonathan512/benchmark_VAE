@@ -1,0 +1,7 @@
+{
+    "name": "DVAEConfig",
+    "latent_dim": 4,
+    "reconstruction_loss": "mse",
+    "gaussian_approximation": "lcd",
+    "number_gaussian_points": 4
+}
