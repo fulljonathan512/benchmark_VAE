@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 import deterministic_gaussian_sampling
+from deterministic_gaussian_sampling_fibonacci import sample_gaussian_fibonacci
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -82,7 +83,7 @@ class DVAE(BaseAE):
         mu, log_var = encoder_output.embedding, encoder_output.log_covariance
 
         std = torch.exp(log_var) # what kind of structure has the log_var? calculate covarianz-matrix
-        dirac_mixture_points = 2
+        dirac_mixture_points = self.model_config.number_gaussian_points
         z, _ = self._sample_deterministic_gauss(mu, std, dirac_mixture_points) # third parameter with number of dirac-mixture points
         recon_x = self.decoder(z)["reconstruction"] # higher dimensional dependent on number of dirac-mixture points
 
@@ -124,9 +125,12 @@ class DVAE(BaseAE):
           covr = torch.diag(t)
           numpyCovr = covr.cpu().detach().numpy()
           approx = np.zeros((numberOfDiracMixture, mu.size(dim=1)))
-          g2d = deterministic_gaussian_sampling.GaussianToDiracApproximation()
-          g2d.approximate_double(numpyCovr, numberOfDiracMixture, mu.size(dim = 1), approx)
-          del g2d
+          if self.model_config.gaussian_approximation == "lcd":
+              g2d = deterministic_gaussian_sampling.GaussianToDiracApproximation()
+              g2d.approximate_double(numpyCovr, numberOfDiracMixture, mu.size(dim=1), approx)
+              del g2d
+          elif self.model_config.gaussian_approximation == "fib":
+              approx = sample_gaussian_fibonacci(np.zeros(mu.size(dim=1)), numpyCovr, numberOfDiracMixture, "Fibonacci").real
           a = torch.cat((a,torch.from_numpy(approx)),0)
 
         mu = torch.repeat_interleave(mu,repeats=numberOfDiracMixture,dim=0)

@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 import deterministic_gaussian_sampling
+from deterministic_gaussian_sampling_fibonacci import sample_gaussian_fibonacci
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -82,7 +83,7 @@ class FCDVAE(BaseAE):
         # log_tri_cov L: Covariance-matrix C = exp(L)*exp(L^T) in flatten version
         mu, log_tri_cov = encoder_output.embedding, encoder_output.tri_cov
         
-        dirac_mixture_points = 2
+        dirac_mixture_points = self.model_config.number_gaussian_points
         z, cov, tri_cov = self._sample_deterministic_gauss(mu, log_tri_cov, dirac_mixture_points) # third parameter with number of dirac-mixture points
         recon_x = self.decoder(z)["reconstruction"] # higher dimensional dependent on number of dirac-mixture points
 
@@ -134,9 +135,12 @@ class FCDVAE(BaseAE):
           cov = torch.mm(tri_cov, torch.transpose(tri_cov,0,1))
           numpyCovr = cov.cpu().detach().numpy()
           approx = np.zeros((numberOfDiracMixture, mu.size(dim=1)))
-          g2d = deterministic_gaussian_sampling.GaussianToDiracApproximation()
-          g2d.approximate_double(numpyCovr, numberOfDiracMixture, mu.size(dim = 1), approx)
-          del g2d
+          if self.model_config.gaussian_approximation == "lcd":
+              g2d = deterministic_gaussian_sampling.GaussianToDiracApproximation()
+              g2d.approximate_double(numpyCovr, numberOfDiracMixture, mu.size(dim = 1), approx)
+              del g2d
+          elif self.model_config.gaussian_approximation == "fib":
+              approx = sample_gaussian_fibonacci(np.zeros(mu.size(dim=1)), numpyCovr, numberOfDiracMixture, "Fibonacci").real
           a = torch.cat((a,torch.from_numpy(approx)),0)
           tri_covs.append(tri_cov)
           covs.append(cov)
@@ -147,7 +151,7 @@ class FCDVAE(BaseAE):
         covs = covs.to(mu.device)
         tri_covs = torch.stack(tri_covs)
         tri_covs = tri_covs.to(mu.device)
-        
+
         return (mu + b).float(), covs, tri_covs
 
     def get_nll(self, data, n_samples=1, batch_size=100):
