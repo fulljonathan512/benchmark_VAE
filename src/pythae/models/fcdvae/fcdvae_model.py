@@ -11,7 +11,7 @@ from ...data.datasets import BaseDataset
 from ..base import BaseAE
 from ..base.base_utils import ModelOutput
 from ..nn import BaseDecoder, BaseEncoder
-from ..nn.default_architectures import Encoder_DVAE_MATRIX_MLP
+from ..nn.default_architectures import Encoder_FCDVAE_MLP
 from .fcdvae_config import FCDVAEConfig
 
 
@@ -56,7 +56,7 @@ class FCDVAE(BaseAE):
                     "automatically"
                 )
 
-            encoder = Encoder_DVAE_MATRIX_MLP(model_config)
+            encoder = Encoder_FCDVAE_MLP(model_config)
             self.model_config.uses_default_encoder = True
 
         else:

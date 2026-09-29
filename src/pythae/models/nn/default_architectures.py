@@ -56,7 +56,7 @@ class Encoder_AE_MLP(BaseEncoder):
 
         return output
 
-class Encoder_DVAE_MATRIX_MLP(BaseEncoder):
+class Encoder_FCDVAE_MLP(BaseEncoder):
     def __init__(self, args: dict):
         BaseEncoder.__init__(self)
         self.input_dim = args.input_dim
@@ -70,7 +70,7 @@ class Encoder_DVAE_MATRIX_MLP(BaseEncoder):
         self.depth = len(layers)
 
         self.embedding = nn.Linear(512, self.latent_dim)
-        matrix_elements = (self.latent_dim*self.latent_dim-self.latent_dim)/2 + self.latent_dim
+        matrix_elements = int((self.latent_dim*self.latent_dim-self.latent_dim)/2 + self.latent_dim)
         self.log_var = nn.Linear(512, matrix_elements)
 
     def forward(self, x, output_layer_levels: List[int] = None):
