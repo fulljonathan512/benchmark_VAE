@@ -3,6 +3,7 @@ import numpy as np
 from pythae.models import FCDVAE, FCDVAEConfig
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
+from dvae_pipline import getDataset
 
 
 def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss_p, folder_name):
@@ -26,14 +27,8 @@ def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gau
   pipeline(train_data=train_data, eval_data=eval_data)
 
 def main():
-  train_data = (
-      np.load('../examples/scripts/data/mnist/train_data.npz')["data"]
-      / 255.0
-  )
-  eval_data = (
-      np.load('../examples/scripts/data/mnist/eval_data.npz')["data"]
-      / 255.0
-  )
+  train_data, eval_data = getDataset("./data/MNIST")
+  
   latent_dims = [2,4,16,32,256]
   rec_loss = ["mse"]
   gaus_approxs = ["fib", "lcd"]

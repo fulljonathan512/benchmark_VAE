@@ -47,9 +47,9 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
 
   pipeline(train_data=train_data, eval_data=eval_data,callbacks=callbacks)
 
-def main():
+def getDataset(folderpath):
   transform = transforms.ToTensor()
-  if(not pathlib.Path("./data/MNIST/train_data.npz").exists()):
+  if(not pathlib.Path(f"{folderpath}/train_data.npz").exists()):
     logger.info("Download train_data")
     train_data = datasets.MNIST(
       root="./data",
@@ -60,7 +60,7 @@ def main():
 
     train_datas = [image for image, label in train_data]
     train_labels= [label for image, label in train_data]
-    np.savez("./data/MNIST/train_data.npz", **{"data":train_datas, "label":train_labels})
+    np.savez(f"{folderpath}/train_data.npz", **{"data":train_datas, "label":train_labels})
 
   if(not pathlib.Path("./data/MNIST/eval_data.npz").exists()):
     logger.info("Download eval_data")
@@ -73,21 +73,25 @@ def main():
 
     eval_datas = [image for image, label in eval_data]
     eval_labels= [label for image, label in eval_data]
-    np.savez("./data/MNIST/eval_data.npz", **{"data":eval_datas, "label":eval_labels})
+    np.savez(f"{folderpath}/eval_data.npz", **{"data":eval_datas, "label":eval_labels})
 
   train_data = (
-        np.load('./data/MNIST/train_data.npz')["data"]
+        np.load(f"{folderpath}/train_data.npz")["data"]
         / 255.0
     )
   eval_data = (
-      np.load( './data/MNIST/eval_data.npz')["data"]
+      np.load(f"{folderpath}/eval_data.npz")["data"]
       / 255.0
   )
+  return train_data, eval_data
+  
+def main():
+  train_data, eval_data = getDataset("./data/MNIST")
 
-  latent_dims = [2] #[2,4,16,32,256]
+  latent_dims = [2,4,16,32,256]
   rec_loss = ["mse"]
-  gaus_approxs = ["lcd"] #["fib", "lcd"]
-  num_gauss_ps = [2] #[2,3,4,5]
+  gaus_approxs = ["fib", "lcd"]
+  num_gauss_ps = [2,3,4,5]
   for ld in latent_dims:
     for ga in gaus_approxs:
       for ngp in num_gauss_ps:
