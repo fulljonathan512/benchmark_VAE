@@ -1,10 +1,9 @@
-import numpy as np
+from dvae_pipline import getDataset
 
 from pythae.models import FCDVAE, FCDVAEConfig
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
-from dvae_pipline import getDataset
-
+from pythae.trainers.training_callbacks import MLFlowCallback
 
 def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss_p, folder_name):
   model_config = FCDVAEConfig(
@@ -22,6 +21,17 @@ def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gau
   training_config = BaseTrainerConfig.from_json_file('base_training_config.json')
   training_config.output_dir = folder_name
 
+  callbacks = []
+  mlflow_cb = MLFlowCallback()
+
+  mlflow_cb.setup(
+    training_config=training_config,
+    model_config=model_config,
+    run_name=folder_name
+  )
+
+  callbacks.append(mlflow_cb)
+
   pipeline = TrainingPipeline(training_config=training_config, model=model)
 
   pipeline(train_data=train_data, eval_data=eval_data)
@@ -29,10 +39,10 @@ def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gau
 def main():
   train_data, eval_data = getDataset("./data/MNIST")
   
-  latent_dims = [2,4,16,32,256]
+  latent_dims = [2,4] #,16,32,256]
   rec_loss = ["mse"]
-  gaus_approxs = ["fib", "lcd"]
-  num_gauss_ps = [2,3,4,5]
+  gaus_approxs = ["lcd"] #["fib", "lcd"]
+  num_gauss_ps = [2]# [2,3,4,5]
   for ld in latent_dims:
     for ga in gaus_approxs:
       for ngp in num_gauss_ps:
