@@ -48,47 +48,39 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   pipeline(train_data=train_data, eval_data=eval_data,callbacks=callbacks)
 
 def getDataset(folderpath):
-  # transform = transforms.ToTensor()
-  # if(not pathlib.Path(f"{folderpath}/train_data.npz").exists()):
-  #   logger.info("Download train_data")
-  #   train_data = datasets.MNIST(
-  #     root="./data",
-  #     train=True,
-  #     download=True,
-  #     transform=transform
-  #   )
+  transform = transforms.ToTensor()
+  if(not pathlib.Path(f"{folderpath}/train_data.npz").exists()):
+    logger.info("Download train_data")
+    train_data = datasets.MNIST(
+      root="./data",
+      train=True,
+      download=True,
+      transform=transform
+    )
 
-  #   train_datas = [image for image, label in train_data]
-  #   train_labels= [label for image, label in train_data]
-  #   np.savez(f"{folderpath}/train_data.npz", **{"data":train_datas, "label":train_labels})
+    train_datas = [image for image, label in train_data]
+    train_labels= [label for image, label in train_data]
+    np.savez(f"{folderpath}/train_data.npz", **{"data":train_datas, "label":train_labels})
 
-  # if(not pathlib.Path("./data/MNIST/eval_data.npz").exists()):
-  #   logger.info("Download eval_data")
-  #   eval_data = datasets.MNIST(
-  #     root="./data",
-  #     train=False,
-  #     download=True,
-  #     transform=transform
-  #   )
+  if(not pathlib.Path("./data/MNIST/eval_data.npz").exists()):
+    logger.info("Download eval_data")
+    eval_data = datasets.MNIST(
+      root="./data",
+      train=False,
+      download=True,
+      transform=transform
+    )
 
-  #   eval_datas = [image for image, label in eval_data]
-  #   eval_labels= [label for image, label in eval_data]
-  #   np.savez(f"{folderpath}/eval_data.npz", **{"data":eval_datas, "label":eval_labels})
+    eval_datas = [image for image, label in eval_data]
+    eval_labels= [label for image, label in eval_data]
+    np.savez(f"{folderpath}/eval_data.npz", **{"data":eval_datas, "label":eval_labels})
 
-  # train_data = (
-  #       np.load(f"{folderpath}/train_data.npz")["data"]
-  #       / 255.0
-  #   )
-  # eval_data = (
-  #     np.load(f"{folderpath}/eval_data.npz")["data"]
-  #     / 255.0
-  # )
   train_data = (
-      np.load('../examples/scripts/data/mnist/train_data.npz')["data"]
-      / 255.0
-  )
+        np.load(f"{folderpath}/train_data.npz")["data"]
+        / 255.0
+    )
   eval_data = (
-      np.load('../examples/scripts/data/mnist/eval_data.npz')["data"]
+      np.load(f"{folderpath}/eval_data.npz")["data"]
       / 255.0
   )
   return train_data, eval_data
