@@ -1,9 +1,17 @@
+import logging
 from dvae_pipline import getDataset
 
 from pythae.models import FCDVAE, FCDVAEConfig
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import MLFlowCallback
+
+logger = logging.getLogger(__name__)
+
+# make it print to the console.
+console = logging.StreamHandler()
+logger.addHandler(console)
+logger.setLevel(logging.INFO)
 
 def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss_p, folder_name):
   model_config = FCDVAEConfig(
@@ -34,7 +42,7 @@ def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gau
 
   pipeline = TrainingPipeline(training_config=training_config, model=model)
 
-  pipeline(train_data=train_data, eval_data=eval_data)
+  pipeline(train_data=train_data, eval_data=eval_data, callbacks=callbacks)
 
 def main():
   train_data, eval_data = getDataset("./data/MNIST")
