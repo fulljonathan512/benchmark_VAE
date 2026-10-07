@@ -1,0 +1,8 @@
+# datasets
+data/
+
+# models
+*_model_*/
+
+# results mlflow
+mlflow.db
