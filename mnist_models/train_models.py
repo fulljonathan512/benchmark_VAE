@@ -1,6 +1,6 @@
-from dvae_pipline import main as dvae
-from fcdvae_pipline import main as fcdvae
-from vae_pipline import main as vae
+from dvae_pipeline import main as dvae
+from fcdvae_pipeline import main as fcdvae
+from vae_pipeline import main as vae
 
 print("-----Train dvae-----")
 dvae()

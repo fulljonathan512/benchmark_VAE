@@ -62,7 +62,7 @@ def getDataset(folderpath):
     train_labels= [label for image, label in train_data]
     np.savez(f"{folderpath}/train_data.npz", **{"data":train_datas, "label":train_labels})
 
-  if(not pathlib.Path("./data/MNIST/eval_data.npz").exists()):
+  if(not pathlib.Path(f"{folderpath}/eval_data.npz").exists()):
     logger.info("Download eval_data")
     eval_data = datasets.MNIST(
       root="./data",

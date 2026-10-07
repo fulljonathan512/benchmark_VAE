@@ -1,6 +1,6 @@
 import logging
 
-from dvae_pipline import getDataset
+from mnist_models.dvae_pipeline import getDataset
 
 from pythae.models import VAE, VAEConfig
 from pythae.pipelines import TrainingPipeline
@@ -43,7 +43,7 @@ def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
 
   
 def main():
-  train_data, eval_data = getDataset("./data/MNIST")
+  train_data, eval_data = getDataset("./data/Cifar10")
 
   latent_dims = [2,4]#[2,4,16,32,256]
   rec_loss = ["mse"]
