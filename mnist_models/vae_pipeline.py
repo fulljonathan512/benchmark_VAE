@@ -1,7 +1,9 @@
 import logging
+import pathlib
+
+import mlflow
 
 from mnist_models.dvae_pipeline import getDataset
-
 from pythae.models import VAE, VAEConfig
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
@@ -27,6 +29,10 @@ def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
 
   training_config = BaseTrainerConfig.from_json_file('base_training_config.json')
   training_config.output_dir = folder_name
+
+  mlflow_db_path = pathlib.Path("../mlflow.db")
+  mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
+  mlflow.set_experiment("MNIST-Dataset")
 
   callbacks = []
   mlflow_cb = MLFlowCallback()

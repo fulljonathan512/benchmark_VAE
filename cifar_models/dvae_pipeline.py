@@ -33,6 +33,10 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   training_config = BaseTrainerConfig.from_json_file('base_training_config.json')
   training_config.output_dir = folder_name
 
+  mlflow_db_path = pathlib.Path("../mlflow.db")
+  mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
+  mlflow.set_experiment("CIFAR10-Dataset")
+
   callbacks = [] # the TrainingPipeline expects a list of callbacks
   mlflow_cb = MLFlowCallback() # Build the callback 
   # SetUp the callback 
