@@ -1,7 +1,8 @@
 import logging
 import pathlib
-import mlflow
+from pathlib import Path
 
+import mlflow
 import numpy as np
 from torchvision import datasets
 
@@ -16,6 +17,8 @@ logger = logging.getLogger(__name__)
 console = logging.StreamHandler()
 logger.addHandler(console)
 logger.setLevel(logging.INFO)
+
+absolute_path = Path(__file__).resolve().parent
 
 def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss_p, folder_name):
   model_config = DVAEConfig(
@@ -33,7 +36,7 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   training_config = BaseTrainerConfig.from_json_file('base_training_config.json')
   training_config.output_dir = folder_name
 
-  mlflow_db_path = pathlib.Path("../mlflow.db")
+  mlflow_db_path = pathlib.Path(f"{absolute_path}/../mlflow.db")
   mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
   mlflow.set_experiment("CIFAR10-Dataset")
 
@@ -52,7 +55,7 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   pipeline(train_data=train_data, eval_data=eval_data,callbacks=callbacks)
 
 def getDataset(folderpath):
-  if(not pathlib.Path(f"{folderpath}/train_data.npz").exists()):
+  if(not pathlib.Path(f"{absolute_path}/{folderpath}/train_data.npz").exists()):
     logger.info("Download train_data")
     train_set = datasets.CIFAR10(
       root="./data/Cifar10",
@@ -62,10 +65,10 @@ def getDataset(folderpath):
         
     train_datas = train_set.data
     train_labels = np.array(train_set.targets)
-    np.savez(f"{folderpath}/train_data.npz", data=train_datas, label=train_labels)
+    np.savez(f"{absolute_path}/{folderpath}/train_data.npz", data=train_datas, label=train_labels)
     
 
-  if(not pathlib.Path(f"{folderpath}/eval_data.npz").exists()):
+  if(not pathlib.Path(f"{absolute_path}/{folderpath}/eval_data.npz").exists()):
     logger.info("Download eval_data")
     eval_set = datasets.CIFAR10(
       root="./data/Cifar10",
@@ -75,14 +78,14 @@ def getDataset(folderpath):
     
     eval_datas = eval_set.data
     eval_labels = np.array(eval_set.targets)
-    np.savez(f"{folderpath}/eval_data.npz", data=eval_datas, label=eval_labels)
+    np.savez(f"{absolute_path}/{folderpath}/eval_data.npz", data=eval_datas, label=eval_labels)
 
   train_data = (
-        np.load(f"{folderpath}/train_data.npz")["data"]
+        np.load(f"{absolute_path}/{folderpath}/train_data.npz")["data"]
         / 255.0
     )
   eval_data = (
-      np.load(f"{folderpath}/eval_data.npz")["data"]
+      np.load(f"{absolute_path}/{folderpath}/eval_data.npz")["data"]
       / 255.0
   )
 

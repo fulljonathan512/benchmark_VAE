@@ -1,5 +1,6 @@
 import logging
 import pathlib
+from pathlib import Path
 
 import mlflow
 
@@ -16,6 +17,8 @@ console = logging.StreamHandler()
 logger.addHandler(console)
 logger.setLevel(logging.INFO)
 
+absolute_path = Path(__file__).resolve().parent
+
 def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
   model_config = VAEConfig(
     input_dim=(1, 28, 28),
@@ -30,7 +33,7 @@ def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
   training_config = BaseTrainerConfig.from_json_file('base_training_config.json')
   training_config.output_dir = folder_name
 
-  mlflow_db_path = pathlib.Path("../mlflow.db")
+  mlflow_db_path = pathlib.Path(f"{absolute_path}/../mlflow.db")
   mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
   mlflow.set_experiment("MNIST-Dataset")
 
@@ -49,7 +52,7 @@ def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
 
   
 def main():
-  train_data, eval_data = getDataset("./data/Cifar10")
+  train_data, eval_data = getDataset("./data/MNIST")
 
   latent_dims = [2,4]#[2,4,16,32,256]
   rec_loss = ["mse"]

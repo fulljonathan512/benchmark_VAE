@@ -1,5 +1,6 @@
 import logging
 import pathlib
+from pathlib import Path
 
 import mlflow
 from dvae_pipeline import getDataset
@@ -15,6 +16,8 @@ logger = logging.getLogger(__name__)
 console = logging.StreamHandler()
 logger.addHandler(console)
 logger.setLevel(logging.INFO)
+
+absolute_path = Path(__file__).resolve().parent
 
 def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss_p, folder_name):
   model_config = FCDVAEConfig(
@@ -32,7 +35,7 @@ def fcdvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gau
   training_config = BaseTrainerConfig.from_json_file('base_training_config.json')
   training_config.output_dir = folder_name
 
-  mlflow_db_path = pathlib.Path("../mlflow.db")
+  mlflow_db_path = pathlib.Path(f"{absolute_path}/../mlflow.db")
   mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
   mlflow.set_experiment("MNIST-Dataset")
 

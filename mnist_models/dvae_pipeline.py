@@ -1,9 +1,10 @@
 import logging
 import pathlib
+from pathlib import Path
 
 import mlflow
 import numpy as np
-from torchvision import datasets, transforms
+from torchvision import datasets
 
 from pythae.models import DVAE, DVAEConfig
 from pythae.pipelines import TrainingPipeline
@@ -16,6 +17,8 @@ logger = logging.getLogger(__name__)
 console = logging.StreamHandler()
 logger.addHandler(console)
 logger.setLevel(logging.INFO)
+
+absolute_path = Path(__file__).resolve().parent
 
 def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss_p, folder_name):
   model_config = DVAEConfig(
@@ -33,65 +36,65 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   training_config = BaseTrainerConfig.from_json_file('base_training_config.json')
   training_config.output_dir = folder_name
 
-  mlflow_db_path = pathlib.Path("../mlflow.db")
+  mlflow_db_path = pathlib.Path(f"{absolute_path}/../mlflow.db")
   mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
   mlflow.set_experiment("MNIST-Dataset")
 
-  callbacks = [] # the TrainingPipeline expects a list of callbacks
-  mlflow_cb = MLFlowCallback() # Build the callback 
-  # SetUp the callback 
+  callbacks = []
+  mlflow_cb = MLFlowCallback()
   mlflow_cb.setup(
-  training_config=training_config, # training config
-  model_config=model_config, # model config
-  run_name=folder_name # specify your mlflow run
+    training_config=training_config,
+    model_config=model_config,
+    run_name=folder_name
   )
-  callbacks.append(mlflow_cb) # Add it to the callbacks list
+  callbacks.append(mlflow_cb)
 
   pipeline = TrainingPipeline(training_config=training_config, model=model)
 
   pipeline(train_data=train_data, eval_data=eval_data,callbacks=callbacks)
 
-def getDataset(folderpath):
-  transform = transforms.ToTensor()
-  if(not pathlib.Path(f"{folderpath}/train_data.npz").exists()):
+def getDataset(folderpath):  
+  if(not Path(f"{absolute_path}/{folderpath}/train_data.npz").exists()):
     logger.info("Download train_data")
-    train_data = datasets.MNIST(
+    train_set = datasets.MNIST(
       root="./data",
       train=True,
       download=True,
-      transform=transform
     )
 
-    train_datas = [image for image, label in train_data]
-    train_labels= [label for image, label in train_data]
-    np.savez(f"{folderpath}/train_data.npz", **{"data":train_datas, "label":train_labels})
+    train_datas = train_set.data
+    train_labels= np.array(train_set.targets)
+    np.savez(f"{absolute_path}/{folderpath}/train_data.npz", data=train_datas, label=train_labels)
 
-  if(not pathlib.Path(f"{folderpath}/eval_data.npz").exists()):
+  if(not pathlib.Path(f"{absolute_path}/{folderpath}/eval_data.npz").exists()):
     logger.info("Download eval_data")
-    eval_data = datasets.MNIST(
+    eval_set = datasets.MNIST(
       root="./data",
       train=False,
       download=True,
-      transform=transform
     )
 
-    eval_datas = [image for image, label in eval_data]
-    eval_labels= [label for image, label in eval_data]
-    np.savez(f"{folderpath}/eval_data.npz", **{"data":eval_datas, "label":eval_labels})
+    eval_datas = eval_set.data
+    eval_labels= np.array(eval_set.targets)
+    np.savez(f"{absolute_path}/{folderpath}/eval_data.npz", data=eval_datas, label=eval_labels)
 
   train_data = (
-        np.load(f"{folderpath}/train_data.npz")["data"]
+        np.load(f"{absolute_path}/{folderpath}/train_data.npz")["data"]
         / 255.0
     )
   eval_data = (
-      np.load(f"{folderpath}/eval_data.npz")["data"]
+      np.load(f"{absolute_path}/{folderpath}/eval_data.npz")["data"]
       / 255.0
   )
+
+  train_data = np.resize(train_data, (60,1,28,28))
+  eval_data = np.resize(eval_data, (6,1,28,28))
+
   return train_data, eval_data
   
 def main():
-  train_data, eval_data = getDataset("./data/MNIST")
-
+  train_data, eval_data = getDataset("/data/MNIST")
+  
   latent_dims = [2,4]#[2,4,16,32,256]
   rec_loss = ["mse"]
   gaus_approxs = ["lcd"] #["fib", "lcd"]
