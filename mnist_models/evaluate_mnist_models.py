@@ -33,43 +33,65 @@ from typing import List, Tuple
 
 import numpy as np
 import torch
+import torchvision.utils as vutils
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
-import torchvision.utils as vutils
+
+try:  # best-effort; if anything fails we let pytorch_fid raise its own error
+    import scipy.linalg as _sp_linalg
+
+    _orig_sqrtm = _sp_linalg.sqrtm
+
+    try:
+        from inspect import signature
+
+        if "disp" not in signature(_orig_sqrtm).parameters:
+
+            def _sqrtm_with_disp(a, disp=False):  # pragma: no cover - simple wrapper
+                """Compatibility wrapper accepting ``disp`` like older SciPy.
+
+                Older SciPy (<=1.x) behaved as follows:
+                  - sqrtm(A) -> matrix
+                  - sqrtm(A, disp=False) -> (matrix, info)
+
+                pytorch_fid calls ``sqrtm(A, disp=False)`` and expects a
+                2-tuple. Newer SciPy versions return only the matrix and do
+                not accept ``disp``. Here we mimic the old API by returning
+                ``(matrix, 0)`` when ``disp`` is given.
+                """
+
+                res = _orig_sqrtm(a)
+                # Emulate old API: (matrix, info) with info=0 (success)
+                return res, 0
+
+            _sp_linalg.sqrtm = _sqrtm_with_disp
+    except Exception:
+        # If we can't introspect the signature, leave sqrtm as-is.
+        pass
+except Exception:
+    pass
 
 import mlflow
-
-from pythae.models import DVAE, DVAEConfig, FCDVAE, FCDVAEConfig, VAE, VAEConfig
 
 # We will reuse pytorch_fid's feature extractor to ensure FID comparability.
 from pytorch_fid.fid_score import calculate_fid_given_paths
 
+from pythae.models import DVAE, FCDVAE, VAE, DVAEConfig, FCDVAEConfig, VAEConfig
+
 
 def get_project_root() -> Path:
-    """Return the absolute path to the benchmark_VAE project root.
-
-    This script lives in benchmark_VAE/mnist_models/, so the root is two
-    levels above this file.
-    """
-
     return Path(__file__).resolve().parents[1]
 
 
 def find_mnist_model_dirs(mnist_models_root: Path) -> List[Path]:
-    """Find all DVAE MNIST model directories.
-
-    A model directory is defined as a path matching *_model_mnist_* that
-    contains a "final_model" subdirectory with a model.pt.
-    """
+    """Find all MNIST model directories."""
 
     model_dirs: List[Path] = []
     for p in mnist_models_root.glob("*_model_mnist_*"):
-        print(p)
         if p.is_dir():
           for f in p.iterdir():
-           print(f)
-           if f.is_dir()  and (f / "model.pt").is_file():
-            model_dirs.append(f)
+           if f.is_dir()  and (f / "final_model" / "model.pt").is_file():
+            model_dirs.append(f / "final_model")
 
     return model_dirs
 
@@ -153,7 +175,7 @@ def decode_latents(model: DVAE, z: torch.Tensor) -> torch.Tensor:
     Handles different return types from ``model.decode`` (tensor, dict, tuple).
     """
 
-    out = model.decode(z)
+    out = model.decoder(z)
     if isinstance(out, dict):
         if "reconstruction" not in out:
             raise KeyError(
@@ -226,6 +248,8 @@ def compute_fid(eval_gt_dir: Path, eval_random_samples_dir: Path) -> float:
         device=device,
         dims=2048,
     )
+    print("fid value:")
+    print(float(fid_value))
 
     return float(fid_value)
 
@@ -259,8 +283,6 @@ def evaluate_single_model(model_dir: Path, project_root: Path, eval_gt_dir, num_
         mlflow.log_param("model_dir", str(model_dir))
         mlflow.log_param("latent_dim", model.model_config.latent_dim)
         mlflow.log_param("reconstruction_loss", model.model_config.reconstruction_loss)
-        mlflow.log_param("gaussian_approximation", model.model_config.gaussian_approximation)
-        mlflow.log_param("number_gaussian_points", model.model_config.number_gaussian_points)
         mlflow.log_param("num_images", num_gt)
 
         mlflow.log_metric("FID", fid_value)
@@ -270,7 +292,8 @@ def main() -> None:
     print("start")
     project_root = get_project_root()
     mnist_models_root = project_root / "mnist_models"
-
+    print(project_root)
+    return 0
     model_dirs = find_mnist_model_dirs(mnist_models_root)
     if not model_dirs:
         print("No *_model_mnist_* model directories with final_model/model.pt found.")
@@ -282,8 +305,11 @@ def main() -> None:
     
     test_loader = prepare_mnist_test_dataset(project_root)
     eval_gt_dir = "eval_gt"
-    num_gt = save_eval_gt_images(eval_gt_dir, test_loader, max_images=None)
-
+    eval_gt_dir = Path(eval_gt_dir)
+    max_images = None
+    max_images = 2048
+    num_gt = save_eval_gt_images(eval_gt_dir, test_loader, max_images=max_images)
+    print(num_gt)
     for model_dir in model_dirs:
         print(f"\nEvaluating model in: {model_dir}")
         try:

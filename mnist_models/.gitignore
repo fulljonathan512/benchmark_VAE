@@ -1,6 +1,9 @@
 # datasets
 data/
 
+# eval data for fid
+eval_gt/
+
 # models
 *_model_*/
 
