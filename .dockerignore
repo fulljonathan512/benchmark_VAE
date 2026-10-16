@@ -1,0 +1,50 @@
+###############################
+# Docker build context ignore #
+###############################
+
+# Version control
+.git
+.gitignore
+
+# Python virtual environment (Windows venv structure)
+# These folders come from a local virtualenv and must not be copied into the image.
+Lib/
+Include/
+Scripts/
+pyvenv.cfg
+
+# Python cache / artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# OS junk
+*.DS_Store
+Thumbs.db
+
+# Tests (optional: only if you don't need them in the image)
+tests/
+
+# Local databases and large runtime artifacts
+mlflow.db
+
+# Build / packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# Local env files / secrets (if you pass them via Docker/compose and not COPY)
+.env
+*.env.*
+
+# Misc
+*.tmp
+*.bak
