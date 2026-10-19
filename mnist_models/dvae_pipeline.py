@@ -54,6 +54,12 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   pipeline(train_data=train_data, eval_data=eval_data,callbacks=callbacks)
 
 def getDataset(folderpath):  
+  # Ensure the dataset directory exists inside the container / project before saving
+  dataset_dir = Path(f"{absolute_path}/{folderpath}")
+
+  if not dataset_dir.exists():
+    dataset_dir.mkdir(parents=True, exist_ok=True)
+
   if(not Path(f"{absolute_path}/{folderpath}/train_data.npz").exists()):
     logger.info("Download train_data")
     train_set = datasets.MNIST(
@@ -97,6 +103,8 @@ def getDataset(folderpath):
   
 def main():
   train_data, eval_data = getDataset("data/MNIST")
+  print("finish")
+  return 0
   
   latent_dims = [2,4]#[2,4,16,32,256] kleinere Stufen, geringerer abstand
   rec_loss = ["mse"]
