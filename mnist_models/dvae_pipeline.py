@@ -103,8 +103,6 @@ def getDataset(folderpath):
   
 def main():
   train_data, eval_data = getDataset("data/MNIST")
-  print("finish")
-  return 0
   
   latent_dims = [2,4]#[2,4,16,32,256] kleinere Stufen, geringerer abstand
   rec_loss = ["mse"]
