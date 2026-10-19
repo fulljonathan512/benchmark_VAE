@@ -93,7 +93,7 @@ def getDataset(folderpath):
   return train_data, eval_data
   
 def main():
-  train_data, eval_data = getDataset("./data/CelebA")
+  train_data, eval_data = getDataset("data/CelebA")
 
   print("Download succesful")
   return 0

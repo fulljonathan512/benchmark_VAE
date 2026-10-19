@@ -95,7 +95,7 @@ def getDataset(folderpath):
   return train_data, eval_data
   
 def main():
-  train_data, eval_data = getDataset("./data/Cifar10")
+  train_data, eval_data = getDataset("data/Cifar10")
 
   latent_dims = [2,4]#[2,4,16,32,256]
   rec_loss = ["mse"]
