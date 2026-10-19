@@ -32,4 +32,4 @@ COPY . .
 
 # When the container starts, train all MNIST models. The training script
 # will create/update database.db (e.g. mlflow.db) and mnist_models/*_model_mnist_*.
-CMD ["python", "mnist_models/train_models.py"]
+CMD ["python", "mnist_models/dvae_pipeline.py"]
