@@ -86,9 +86,6 @@ def getDataset(folderpath):
     eval_labels= np.array(eval_set.targets)
     np.savez(f"{absolute_path}/{folderpath}/eval_data.npz", data=eval_datas, label=eval_labels)
 
-
-  for item in Path(".").iterdir():
-    print(item)
   train_data = (
         np.load(f"{absolute_path}/{folderpath}/train_data.npz")["data"]
         / 255.0

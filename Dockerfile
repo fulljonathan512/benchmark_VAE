@@ -30,6 +30,17 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the whole repo into the image (respecting .dockerignore)
 COPY . .
 
-# When the container starts, train all MNIST models. The training script
-# will create/update database.db (e.g. mlflow.db) and mnist_models/*_model_mnist_*.
-CMD ["python", "mnist_models/dvae_pipeline.py"]
+# When the container starts, first check that a GPU is visible inside the
+# container (i.e. it was started with `--gpus` and NVIDIA Docker runtime).
+# If no GPU is detected, exit with a clear error instead of failing later
+# with a PyTorch / CUDA error.
+CMD sh -lc '
+  if [ -z "${NVIDIA_VISIBLE_DEVICES}" ] || [ "${NVIDIA_VISIBLE_DEVICES}" = "void" ]; then
+    echo "ERROR: No GPU detected inside the container."
+    echo "       Please run the container with GPU support, e.g.:"
+    echo "         docker run --rm --gpus all <image_name>"
+    exit 1
+  fi
+
+  python mnist_models/dvae_pipeline.py
+'
