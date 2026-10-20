@@ -34,4 +34,4 @@ COPY . .
 # container (i.e. it was started with `--gpus` and NVIDIA Docker runtime).
 # If no GPU is detected, exit with a clear error instead of failing later
 # with a PyTorch / CUDA error.
-CMD ["sh", "-lc", "echo 'test'; nvidia-smi; if [ -z \"$NVIDIA_VISIBLE_DEVICES\" ] || [ \"$NVIDIA_VISIBLE_DEVICES\" = \"void\" ]; then echo 'ERROR: No GPU detected inside the container.'; echo '       Please run the container with GPU support, e.g.:'; echo '         docker run --rm --gpus all <image_name>'; exit 1; fi; python mnist_models/dvae_pipeline.py"]
+CMD ["python", "mnist_models/dvae_pipeline.py"]
