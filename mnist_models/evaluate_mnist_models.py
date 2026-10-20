@@ -289,11 +289,9 @@ def evaluate_single_model(model_dir: Path, project_root: Path, eval_gt_dir, num_
 
 
 def main() -> None:
-    print("start")
     project_root = get_project_root()
     mnist_models_root = project_root / "mnist_models"
-    print(project_root)
-    return 0
+
     model_dirs = find_mnist_model_dirs(mnist_models_root)
     if not model_dirs:
         print("No *_model_mnist_* model directories with final_model/model.pt found.")
