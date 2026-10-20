@@ -30,8 +30,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the whole repo into the image (respecting .dockerignore)
 COPY . .
 
-# When the container starts, first check that a GPU is visible inside the
-# container (i.e. it was started with `--gpus` and NVIDIA Docker runtime).
-# If no GPU is detected, exit with a clear error instead of failing later
-# with a PyTorch / CUDA error.
-CMD ["python", "mnist_models/dvae_pipeline.py"]
+# When the container starts, first print the CUDA version that PyTorch sees
+# (if torch is installed and built with CUDA), then run the main pipeline.
+# This will output something like "CUDA version from torch.version.cuda: 12.1"
+# at container startup. If torch is not available or has no CUDA, it will
+# print a corresponding message.
+CMD ["sh", "-c", "python -c 'import sys;\ntry:\n import torch;\n v = getattr(getattr(torch, \"version\", None), \"cuda\", None);\n print(\"CUDA version from torch.version.cuda:\", v);\nexcept Exception as e:\n print(\"Could not determine CUDA version via torch:\", e);\n sys.exit(0)'; python mnist_models/dvae_pipeline.py"]
