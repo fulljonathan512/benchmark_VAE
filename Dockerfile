@@ -20,10 +20,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Create directories for outputs (models and database) and mark them as volumes
-RUN mkdir -p /app/mnist_models /app/db
-VOLUME ["/app/mnist_models", "/app/db"]
-
 # Copy only requirement spec first for better caching
 COPY requirements.txt ./
 
