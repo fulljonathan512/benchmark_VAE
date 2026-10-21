@@ -34,4 +34,5 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the whole repo into the image (respecting .dockerignore)
 COPY . .
 
-CMD ["sh", "-c", "python mnist_models/dvae_pipeline.py; cp -a /mnist_models/. /results; cp database.db /results"]
+CMD ["sh", "-c", "ls"]
+# CMD ["sh", "-c", "python mnist_models/dvae_pipeline.py; cp -a /mnist_models/. /results; cp database.db /results"]
