@@ -209,16 +209,17 @@ class MetricConsolePrinterCallback(TrainingCallback):
             epoch_train_loss = logs.get("train_epoch_loss", None)
             epoch_eval_loss = logs.get("eval_epoch_loss", None)
 
-            logger.info(
-                "--------------------------------------------------------------------------"
-            )
-            if epoch_train_loss is not None:
-                logger.info(f"Train loss: {np.round(epoch_train_loss, 4)}")
-            if epoch_eval_loss is not None:
-                logger.info(f"Eval loss: {np.round(epoch_eval_loss, 4)}")
-            logger.info(
-                "--------------------------------------------------------------------------"
-            )
+            if epoch_train_loss is not None and epoch_eval_loss is not None:
+              logger.info(
+                  "--------------------------------------------------------------------------"
+              )
+              if epoch_train_loss is not None:
+                  logger.info(f"Train loss: {np.round(epoch_train_loss, 4)}")
+              if epoch_eval_loss is not None:
+                  logger.info(f"Eval loss: {np.round(epoch_eval_loss, 4)}")
+              logger.info(
+                  "--------------------------------------------------------------------------"
+              )
 
 
 class TrainHistoryCallback(MetricConsolePrinterCallback):
