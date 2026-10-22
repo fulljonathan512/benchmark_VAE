@@ -30,7 +30,7 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   training_config = BaseTrainerConfig.from_json_file(str(training_config_path))
   training_config.output_dir = str(absolute_path / 'results' / folder_name)
 
-  mlflow_db_path = pathlib.Path(f"{absolute_path}/../mlflow.db")
+  mlflow_db_path = pathlib.Path(f"{absolute_path}/../results/mlflow.db")
   mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
   mlflow.set_experiment("MNIST-Dataset")
 
@@ -93,10 +93,10 @@ def getDataset(folderpath):
 def main():
   train_data, eval_data = getDataset("data/MNIST")
   
-  latent_dims = [2,3,4,5,6,7,8,16,32,64,128,256]
+  latent_dims = [2] #,3,4,5,6,7,8,16,32,64,128,256]
   rec_loss = ["mse"]
-  gaus_approxs = ["fib", "lcd"]
-  num_gauss_ps = [2,3,4,5,6,7,8,9,10]
+  gaus_approxs = ["fib"]#, "lcd"]
+  num_gauss_ps = [1] #2,3,4,5,6,7,8,9,10]
   for ld in latent_dims:
     for ga in gaus_approxs:
       for ngp in num_gauss_ps:
