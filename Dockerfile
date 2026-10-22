@@ -31,4 +31,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 
-CMD ["sh", "-c", "python mnist_models/dvae_pipeline.py; ls; cp -a /mnist_models/. /results; cp mlflow.db /results"]
+CMD ["sh", "-c", "python mnist_models/dvae_pipeline.py; ls; ls mnist_models; cp -a mnist_models/. results; cp mlflow.db /results"]
