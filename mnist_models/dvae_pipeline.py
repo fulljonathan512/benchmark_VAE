@@ -1,4 +1,3 @@
-import logging
 import pathlib
 from pathlib import Path
 
@@ -10,13 +9,6 @@ from pythae.models import DVAE, DVAEConfig
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import MLFlowCallback
-
-# logger = logging.getLogger(__name__)
-
-# # make it print to the console.
-# console = logging.StreamHandler()
-# logger.addHandler(console)
-# logger.setLevel(logging.INFO)
 
 absolute_path = Path(__file__).resolve().parent
 
@@ -36,7 +28,7 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   # Load trainer config from JSON next to this script (works both locally and in Docker)
   training_config_path = absolute_path / 'base_training_config.json'
   training_config = BaseTrainerConfig.from_json_file(str(training_config_path))
-  training_config.output_dir = str(absolute_path / folder_name)
+  training_config.output_dir = str(absolute_path / 'results' / folder_name)
 
   mlflow_db_path = pathlib.Path(f"{absolute_path}/../mlflow.db")
   mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
@@ -63,7 +55,6 @@ def getDataset(folderpath):
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
   if(not Path(f"{absolute_path}/{folderpath}/train_data.npz").exists()):
-    # logger.info("Download train_data")
     train_set = datasets.MNIST(
       root="./data",
       train=True,
@@ -75,7 +66,6 @@ def getDataset(folderpath):
     np.savez(f"{absolute_path}/{folderpath}/train_data.npz", data=train_datas, label=train_labels)
 
   if(not pathlib.Path(f"{absolute_path}/{folderpath}/eval_data.npz").exists()):
-    # logger.info("Download eval_data")
     eval_set = datasets.MNIST(
       root="./data",
       train=False,
