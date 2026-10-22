@@ -15,9 +15,9 @@ from .base_pipeline import Pipeline
 logger = logging.getLogger(__name__)
 
 # make it print to the console.
-console = logging.StreamHandler()
-logger.addHandler(console)
-logger.setLevel(logging.INFO)
+# console = logging.StreamHandler()
+# logger.addHandler(console)
+# logger.setLevel(logging.INFO)
 
 
 class TrainingPipeline(Pipeline):
