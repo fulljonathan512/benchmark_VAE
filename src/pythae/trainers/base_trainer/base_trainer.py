@@ -315,8 +315,8 @@ class BaseTrainer:
             callbacks=self.callbacks, model=self.model
         )
 
-        self.callback_handler.add_callback(ProgressBarCallback())
-        self.callback_handler.add_callback(MetricConsolePrinterCallback())
+        # self.callback_handler.add_callback(ProgressBarCallback())
+        # self.callback_handler.add_callback(MetricConsolePrinterCallback())
 
     def _run_model_sanity_check(self, model, loader):
         try:

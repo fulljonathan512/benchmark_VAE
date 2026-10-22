@@ -11,6 +11,7 @@ from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import MLFlowCallback
 
+logging.disable(logging.CRITICAL)
 logger = logging.getLogger(__name__)
 
 # make it print to the console.
@@ -103,14 +104,17 @@ def getDataset(folderpath):
 def main():
   train_data, eval_data = getDataset("data/MNIST")
   
-  latent_dims = [2] #,3,4,5,6,7,8,16,32,64,128,256]
+  latent_dims = [2,3,4,5,6,7,8,16,32,64,128,256]
   rec_loss = ["mse"]
-  gaus_approxs = ["fib"]#, "lcd"]
-  num_gauss_ps = [1] #2,3,4,5,6,7,8,9,10]
+  gaus_approxs = ["fib", "lcd"]
+  num_gauss_ps = [1,2,3,4,5,6,7,8,9,10]
+  models = len(latent_dims) * len(rec_loss) * len(gaus_approxs) * len(num_gauss_ps)
+  i = 1
   for ld in latent_dims:
     for ga in gaus_approxs:
       for ngp in num_gauss_ps:
         if(ga != "fib" or ld <= 6):
+          print(f"train model: dvae_mnist_{ld}_{rec_loss[0]}_{ga}_{ngp}  | ({i}/{models})")
           dvaeModels(
             train_data=train_data, 
             eval_data=eval_data, 
@@ -120,6 +124,7 @@ def main():
             num_gauss_p=ngp,
             folder_name=f"dvae_model_mnist_{ld}_{rec_loss[0]}_{ga}_{ngp}"
           )
+        i = i+1
 
 if __name__ == "__main__":
   main()
