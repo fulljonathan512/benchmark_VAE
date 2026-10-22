@@ -36,7 +36,7 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
   # Load trainer config from JSON next to this script (works both locally and in Docker)
   training_config_path = absolute_path / 'base_training_config.json'
   training_config = BaseTrainerConfig.from_json_file(str(training_config_path))
-  training_config.output_dir = absolute_path / folder_name
+  training_config.output_dir = str(absolute_path / folder_name)
 
   mlflow_db_path = pathlib.Path(f"{absolute_path}/../mlflow.db")
   mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
