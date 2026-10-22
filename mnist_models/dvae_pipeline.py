@@ -93,10 +93,10 @@ def getDataset(folderpath):
 def main():
   train_data, eval_data = getDataset("data/MNIST")
   
-  latent_dims = [2,4]#[2,4,16,32,256] kleinere Stufen, geringerer abstand
+  latent_dims = [2,3,4,5,6,7,8,16,32,64,128,256]
   rec_loss = ["mse"]
-  gaus_approxs = ["lcd"] #["fib", "lcd"]
-  num_gauss_ps = [2] #[2,3,4,5]
+  gaus_approxs = ["fib", "lcd"]
+  num_gauss_ps = [2,3,4,5,6,7,8,9,10]
   for ld in latent_dims:
     for ga in gaus_approxs:
       for ngp in num_gauss_ps:
