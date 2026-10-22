@@ -11,12 +11,12 @@ from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import MLFlowCallback
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
-# make it print to the console.
-console = logging.StreamHandler()
-logger.addHandler(console)
-logger.setLevel(logging.INFO)
+# # make it print to the console.
+# console = logging.StreamHandler()
+# logger.addHandler(console)
+# logger.setLevel(logging.INFO)
 
 absolute_path = Path(__file__).resolve().parent
 
@@ -63,7 +63,7 @@ def getDataset(folderpath):
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
   if(not Path(f"{absolute_path}/{folderpath}/train_data.npz").exists()):
-    logger.info("Download train_data")
+    # logger.info("Download train_data")
     train_set = datasets.MNIST(
       root="./data",
       train=True,
@@ -75,7 +75,7 @@ def getDataset(folderpath):
     np.savez(f"{absolute_path}/{folderpath}/train_data.npz", data=train_datas, label=train_labels)
 
   if(not pathlib.Path(f"{absolute_path}/{folderpath}/eval_data.npz").exists()):
-    logger.info("Download eval_data")
+    # logger.info("Download eval_data")
     eval_set = datasets.MNIST(
       root="./data",
       train=False,
