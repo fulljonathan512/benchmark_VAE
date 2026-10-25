@@ -76,7 +76,7 @@ pydantic==2.13.4
 pydantic_core==2.46.4
 pyparsing==3.3.3
 PySocks==1.7.1
--e git+https://github.com/fulljonathan512/benchmark_VAE.git@cc55e4881859cd152a2a5bcb0bd38b55ad982059#egg=pythae
+-e git+https://github.com/fulljonathan512/benchmark_VAE.git#egg=pythae
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.3
 pytorch-fid==0.3.0
