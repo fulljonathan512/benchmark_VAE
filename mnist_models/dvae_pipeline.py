@@ -117,14 +117,14 @@ def main():
           print(f"train model: dvae_mnist_{ld}_{rec_loss[0]}_{ga}_{ngp}  | ({i}/{models})")
           try:
               dvaeModels(
-                          train_data=train_data, 
-                          eval_data=eval_data, 
-                          latent_dim=ld, 
-                          rec_loss=rec_loss[0], 
-                          gauss_app= ga, 
-                          num_gauss_p=ngp,
-                          folder_name=f"dvae_model_mnist_{ld}_{rec_loss[0]}_{ga}_{ngp}"
-                        )
+                train_data=train_data, 
+                eval_data=eval_data, 
+                latent_dim=ld, 
+                rec_loss=rec_loss[0], 
+                gauss_app= ga, 
+                num_gauss_p=ngp,
+                folder_name=f"dvae_model_mnist_{ld}_{rec_loss[0]}_{ga}_{ngp}"
+              )
           except Exception as e:
               print(f"Operation failed: {e}")
         i = i+1
