@@ -35,7 +35,7 @@ def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
   training_config = BaseTrainerConfig.from_json_file(str(training_config_path))
   training_config.output_dir = str(absolute_path / 'results' / folder_name)
   
-  mlflow_db_path = pathlib.Path(f"{absolute_path}/../mlflow.db")
+  mlflow_db_path = pathlib.Path(f"{absolute_path}/../results/mlflow.db")
   mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path}")
   mlflow.set_experiment("MNIST-Dataset")
 
