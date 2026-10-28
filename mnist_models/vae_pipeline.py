@@ -3,8 +3,8 @@ import pathlib
 from pathlib import Path
 
 import mlflow
+from dvae_pipeline import getDataset
 
-from mnist_models.dvae_pipeline import getDataset
 from pythae.models import VAE, VAEConfig
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
