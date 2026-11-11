@@ -290,7 +290,7 @@ def evaluate_single_model(model_dir: Path, project_root: Path, eval_gt_dir, num_
 
 def main() -> None:
     project_root = get_project_root()
-    mnist_models_root = project_root / "mnist_models"
+    mnist_models_root = project_root / "mnist_models/results"
 
     model_dirs = find_mnist_model_dirs(mnist_models_root)
     if not model_dirs:
@@ -301,9 +301,8 @@ def main() -> None:
     for d in model_dirs:
         print(" -", d)
     
-    test_loader = prepare_mnist_test_dataset(project_root)
-    eval_gt_dir = "eval_gt"
-    eval_gt_dir = Path(eval_gt_dir)
+    test_loader = prepare_mnist_test_dataset(mnist_models_root)
+    eval_gt_dir = project_root / "mnist_models/eval_gt"
     max_images = None
     max_images = 2048
     num_gt = save_eval_gt_images(eval_gt_dir, test_loader, max_images=max_images)
