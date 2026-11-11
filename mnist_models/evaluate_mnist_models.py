@@ -275,7 +275,7 @@ def evaluate_single_model(model_dir: Path, project_root: Path, eval_gt_dir, num_
     fid_value = compute_fid(eval_gt_dir, eval_random_samples_dir)
 
     # Log to mlflow
-    mlflow_db_path = project_root / "mlflow.db"
+    mlflow_db_path = project_root / "results/mlflow.db"
     setup_mlflow(mlflow_db_path)
 
     run_name = f"metrics_{model_dir.parent.name}"
