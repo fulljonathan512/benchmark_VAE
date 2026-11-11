@@ -6,6 +6,10 @@ import mlflow
 from dvae_pipeline import getDataset
 
 from pythae.models import VAE, VAEConfig
+from pythae.models.nn.benchmarks.mnist import (
+  Encoder_Conv_VAE_MNIST,
+  Decoder_Conv_AE_MNIST,
+)
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import MLFlowCallback
@@ -28,7 +32,9 @@ def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
   )
 
   model = VAE(
-    model_config=model_config
+    model_config=model_config,
+    encoder=Encoder_Conv_VAE_MNIST(model_config),
+    decoder=Decoder_Conv_AE_MNIST(model_config),
   )
 
   training_config_path = absolute_path / 'base_training_config.json'
