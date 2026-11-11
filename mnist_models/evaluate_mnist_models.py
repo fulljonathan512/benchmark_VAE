@@ -304,7 +304,6 @@ def main() -> None:
     test_loader = prepare_mnist_test_dataset(mnist_models_root)
     eval_gt_dir = project_root / "mnist_models/eval_gt"
     max_images = None
-    max_images = 2048
     num_gt = save_eval_gt_images(eval_gt_dir, test_loader, max_images=max_images)
     print(num_gt)
     for model_dir in model_dirs:
