@@ -238,9 +238,18 @@ class Encoder_Conv_VAE_MNIST(BaseEncoder):
 
         layers.append(
             nn.Sequential(
-                nn.Conv2d(self.n_channels, 128, 4, 2, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(),
+                nn.Conv2d(self.n_channels, 32, 4, 2, padding=1), nn.BatchNorm2d(32), nn.ReLU(),
+            )
+        )
+        layers.append(
+            nn.Sequential(
+                nn.Conv2d(32, 64, 4, 2, padding=1), nn.BatchNorm2d(64), nn.ReLU()
+            )
+        )
+
+        layers.append(
+            nn.Sequential(
+                nn.Conv2d(64, 128, 4, 2, padding=1), nn.BatchNorm2d(128), nn.ReLU()
             )
         )
 
