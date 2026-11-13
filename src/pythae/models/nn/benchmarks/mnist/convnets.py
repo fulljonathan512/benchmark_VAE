@@ -88,25 +88,25 @@ class Encoder_Conv_AE_MNIST(BaseEncoder):
             nn.Sequential(
                 nn.Conv2d(self.n_channels, 128, 4, 2, padding=1),
                 nn.BatchNorm2d(128),
-                nn.ReLU(),
+                nn.LeakyReLu(),
             )
         )
 
         layers.append(
             nn.Sequential(
-                nn.Conv2d(128, 256, 4, 2, padding=1), nn.BatchNorm2d(256), nn.ReLU()
+                nn.Conv2d(128, 256, 4, 2, padding=1), nn.BatchNorm2d(256), nn.LeakyReLU()
             )
         )
 
         layers.append(
             nn.Sequential(
-                nn.Conv2d(256, 512, 4, 2, padding=1), nn.BatchNorm2d(512), nn.ReLU()
+                nn.Conv2d(256, 512, 4, 2, padding=1), nn.BatchNorm2d(512), nn.LeakyReLU()
             )
         )
 
         layers.append(
             nn.Sequential(
-                nn.Conv2d(512, 1024, 4, 2, padding=1), nn.BatchNorm2d(1024), nn.ReLU()
+                nn.Conv2d(512, 1024, 4, 2, padding=1), nn.BatchNorm2d(1024), nn.LeakyReLU()
             )
         )
 
@@ -549,7 +549,7 @@ class Decoder_Conv_AE_MNIST(BaseDecoder):
             nn.Sequential(
                 nn.ConvTranspose2d(1024, 512, 3, 2, padding=1),
                 nn.BatchNorm2d(512),
-                nn.ReLU(),
+                nn.LeakyReLU(),
             )
         )
 
@@ -557,7 +557,7 @@ class Decoder_Conv_AE_MNIST(BaseDecoder):
             nn.Sequential(
                 nn.ConvTranspose2d(512, 256, 3, 2, padding=1, output_padding=1),
                 nn.BatchNorm2d(256),
-                nn.ReLU(),
+                nn.LeakyReLU(),
             )
         )
 
