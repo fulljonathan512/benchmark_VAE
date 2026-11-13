@@ -4,12 +4,11 @@ from pathlib import Path
 
 import mlflow
 import numpy as np
-from torchvision import datasets
-
 from pythae.models import DVAE, DVAEConfig
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import MLFlowCallback
+from torchvision import datasets, transforms
 
 logging.disable(logging.CRITICAL)
 logger = logging.getLogger(__name__)
@@ -69,6 +68,7 @@ def getDataset(folderpath):
       root="./data",
       train=True,
       download=True,
+      transform=transforms.ToTensor()
     )
 
     train_datas = train_set.data
