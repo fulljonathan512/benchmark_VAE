@@ -77,6 +77,10 @@ import mlflow
 from pytorch_fid.fid_score import calculate_fid_given_paths
 
 from pythae.models import DVAE, FCDVAE, VAE, DVAEConfig, FCDVAEConfig, VAEConfig
+from pythae.models.nn.benchmarks.mnist import (
+    Encoder_Conv_VAE_MNIST,
+    Decoder_Conv_AE_MNIST,
+)
 
 
 def get_project_root() -> Path:
@@ -109,17 +113,27 @@ def load_model_from_dir(model_dir: Path) -> DVAE:
     with open(config_path, "r", encoding="utf-8") as f:
         cfg_dict = json.load(f)
 
-    
     cfg_dict = {k: v for k, v in cfg_dict.items() if k != "name"}
-    if "fcdvae" in str(model_dir):  
-      config = FCDVAEConfig(**cfg_dict)
-      model = FCDVAE(model_config=config)
+
+    # Instantiate the correct model class depending on directory name.
+    # For plain VAE MNIST models we must use the same conv encoder/decoder
+    # as in the training pipeline (vae_pipeline.py) to match the checkpoint
+    # state_dict keys like encoder.layers.0.0.weight, decoder.layers.1.0.weight, etc.
+    if "fcdvae" in str(model_dir):
+        config = FCDVAEConfig(**cfg_dict)
+        model = FCDVAE(model_config=config)
     elif "dvae" in str(model_dir):
-      config = DVAEConfig(**cfg_dict)
-      model = DVAE(model_config=config)
+        config = DVAEConfig(**cfg_dict)
+        model = DVAE(model_config=config)
     else:
-      config = VAEConfig(**cfg_dict)
-      model = VAE(model_config=config)
+        config = VAEConfig(**cfg_dict)
+        # Use conv MNIST benchmark architectures to be consistent with training
+        # (see mnist_models/vae_pipeline.py).
+        model = VAE(
+            model_config=config,
+            encoder=Encoder_Conv_VAE_MNIST(config),
+            decoder=Decoder_Conv_AE_MNIST(config),
+        )
 
     state_dict = torch.load(model_path, map_location="cpu")
     if isinstance(state_dict, dict) and "model_state_dict" in state_dict:
