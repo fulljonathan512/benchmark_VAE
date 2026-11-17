@@ -456,7 +456,7 @@ class BaseTrainer:
 
             metrics = {}
 
-            epoch_train_loss, step_train_loss = self.train_step(epoch)
+            epoch_train_loss, step_train_loss, epoch_train_mse = self.train_step(epoch)
             for i in range(len(step_train_loss)):
               batch_metrics = {"train_batch_loss":step_train_loss[i]}
               self.callback_handler.on_log(
@@ -467,10 +467,11 @@ class BaseTrainer:
                               rank=self.rank,
                           )
               train_counter = train_counter + 1
-            metrics["train_epoch_loss"] = epoch_train_loss
+            metrics["train_epoch_elbo"] = epoch_train_loss
+            metrics["train_epoch_mse"] = epoch_train_mse
 
             if self.eval_dataset is not None:
-                epoch_eval_loss, batch_eval_loss = self.eval_step(epoch)
+                epoch_eval_loss, batch_eval_loss, epoch_eval_mse = self.eval_step(epoch)
                 for i in range(len(batch_eval_loss)):
                   batch_metrics = {"eval_batch_loss":batch_eval_loss[i]}
                   self.callback_handler.on_log(
@@ -482,6 +483,7 @@ class BaseTrainer:
                               )
                   eval_counter = eval_counter + 1
                 metrics["eval_epoch_loss"] = epoch_eval_loss
+                metrics["eval_epoch_mse"] = epoch_eval_mse
                 self._schedulers_step(epoch_eval_loss)
 
             else:
@@ -576,6 +578,7 @@ class BaseTrainer:
         self.model.eval()
 
         epoch_loss = 0
+        epoch_mse = 0
         batch_loss = []
 
         with self.amp_context:
@@ -600,8 +603,10 @@ class BaseTrainer:
                     )
 
                 loss = model_output.loss
+                recon_loss = model_output.recon_loss
 
                 epoch_loss += loss.item()
+                epoch_mse += recon_loss.item()
                 batch_loss.append(loss.item())
 
                 if epoch_loss != epoch_loss:
@@ -612,8 +617,9 @@ class BaseTrainer:
                 )
 
         epoch_loss /= len(self.eval_loader)
+        epoch_mse /= len(self.eval_loader)
 
-        return epoch_loss, batch_loss
+        return epoch_loss, batch_loss, epoch_mse
 
     def train_step(self, epoch: int):
         """The trainer performs training loop over the train_loader.
@@ -635,6 +641,7 @@ class BaseTrainer:
         self.model.train()
 
         epoch_loss = 0
+        epoch_mse = 0
         batch_loss = []
 
         for inputs in self.train_loader:
@@ -651,8 +658,10 @@ class BaseTrainer:
             self._optimizers_step(model_output)
 
             loss = model_output.loss
-
+            recon_loss = model_output.recon_loss
+            
             epoch_loss += loss.item()
+            epoch_mse += recon_loss.item()
             batch_loss.append(loss.item())
 
             if epoch_loss != epoch_loss:
@@ -669,8 +678,9 @@ class BaseTrainer:
             self.model.update()
 
         epoch_loss /= len(self.train_loader)
+        epoch_mse /= len(self.train_loader)
 
-        return epoch_loss, batch_loss
+        return epoch_loss, batch_loss, epoch_mse
 
     def save_model(self, model: BaseAE, dir_path: str):
         """This method saves the final model along with the config files
