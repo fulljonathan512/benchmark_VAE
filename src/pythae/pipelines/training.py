@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 # make it print to the console.
 console = logging.StreamHandler()
-logger.addHandler(console)
-logger.setLevel(logging.INFO)
+#logger.addHandler(console)
+#logger.setLevel(logging.INFO)
 
 
 class TrainingPipeline(Pipeline):

@@ -14,13 +14,13 @@ from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import MLFlowCallback
 
-logging.disable(logging.CRITICAL)
+#logging.disable(logging.CRITICAL)
 logger = logging.getLogger(__name__)
 
 # make it print to the console.
 console = logging.StreamHandler()
-logger.addHandler(console)
-logger.setLevel(logging.INFO)
+#logger.addHandler(console)
+#logger.setLevel(logging.INFO)
 
 absolute_path = Path(__file__).resolve().parent
 
@@ -33,8 +33,8 @@ def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
 
   model = VAE(
     model_config=model_config,
-    encoder=Encoder_Conv_VAE_MNIST(model_config),
-    decoder=Decoder_Conv_AE_MNIST(model_config),
+    # encoder=Encoder_Conv_VAE_MNIST(model_config),
+    # decoder=Decoder_Conv_AE_MNIST(model_config),
   )
 
   training_config_path = absolute_path / 'base_training_config.json'
@@ -62,7 +62,7 @@ def vaeModels(train_data, eval_data, latent_dim, rec_loss, folder_name):
 def main():
   train_data, eval_data = getDataset("./data/MNIST")
 
-  latent_dims = [2,3,4,5,6,7,8,16,32,64,128,256]
+  latent_dims = [2] #,3,4,5,6,7,8,16,32,64,128,256]
   rec_loss = ["mse"]
   models = len(latent_dims) * len(rec_loss)
   i = 1
