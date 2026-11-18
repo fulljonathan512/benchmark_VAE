@@ -62,42 +62,59 @@ def getDataset(folderpath):
   if not dataset_dir.exists():
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
-  if(not Path(f"{absolute_path}/{folderpath}/train_data.npz").exists()):
-    logger.info("Download train_data")
-    train_set = datasets.MNIST(
-      root="./data",
-      train=True,
-      download=True,
-      transform=transforms.ToTensor()
-    )
-
-    train_datas = train_set.data
-    train_labels= np.array(train_set.targets)
-    np.savez(f"{absolute_path}/{folderpath}/train_data.npz", data=train_datas, label=train_labels)
-
-  if(not pathlib.Path(f"{absolute_path}/{folderpath}/eval_data.npz").exists()):
-    logger.info("Download eval_data")
-    eval_set = datasets.MNIST(
-      root="./data",
-      train=False,
-      download=True,
-    )
-
-    eval_datas = eval_set.data
-    eval_labels= np.array(eval_set.targets)
-    np.savez(f"{absolute_path}/{folderpath}/eval_data.npz", data=eval_datas, label=eval_labels)
-
-  train_data = (
-        np.load(f"{absolute_path}/{folderpath}/train_data.npz")["data"]
-        / 255.0
-    )
-  eval_data = (
-      np.load(f"{absolute_path}/{folderpath}/eval_data.npz")["data"]
-      / 255.0
+  # if(not Path(f"{absolute_path}/{folderpath}/train_data.npz").exists()):
+    # logger.info("Download train_data")
+  train_set = datasets.MNIST(
+    root="./data",
+    train=True,
+    download=True,
+    transform=transforms.ToTensor()
   )
 
-  train_data = np.resize(train_data, (60,1,28,28))
-  eval_data = np.resize(eval_data, (6,1,28,28))
+  train_data = train_set.data
+    # train_labels= np.array(train_set.targets)
+    # np.savez(f"{absolute_path}/{folderpath}/train_data.npz", data=train_datas, label=train_labels)
+
+  # if(not pathlib.Path(f"{absolute_path}/{folderpath}/eval_data.npz").exists()):
+  #   logger.info("Download eval_data")
+  eval_set = datasets.MNIST(
+    root="./data",
+    train=False,
+    download=True,
+    transform=transforms.ToTensor()
+  )
+
+  eval_data = eval_set.data
+  print("Size of train data")
+  print(train_data.size())
+  count_greater_than_0 = (train_data > 0).sum().item()
+  maximum = train_data.max().item()
+
+  print("Count > 0:", count_greater_than_0)
+  print("Maximum:", maximum)
+
+  print("Size of eval data")
+  print(eval_data.size())
+  
+  count_greater_than_0 = (eval_data > 0).sum().item()
+  maximum = eval_data.max().item()
+
+  print("Count > 0:", count_greater_than_0)
+  print("Maximum:", maximum)
+    # eval_labels= np.array(eval_set.targets)
+  #   np.savez(f"{absolute_path}/{folderpath}/eval_data.npz", data=eval_datas, label=eval_labels)
+
+  # train_data = (
+  #       np.load(f"{absolute_path}/{folderpath}/train_data.npz")["data"]
+  #       / 255.0
+  #   )
+  # eval_data = (
+  #     np.load(f"{absolute_path}/{folderpath}/eval_data.npz")["data"]
+  #     / 255.0
+  # )
+
+  # train_data = np.resize(train_data, (60,1,28,28))
+  # eval_data = np.resize(eval_data, (6,1,28,28))
 
   return train_data, eval_data
   
