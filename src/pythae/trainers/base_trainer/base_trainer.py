@@ -29,8 +29,8 @@ logger = logging.getLogger(__name__)
 
 # make it print to the console.
 console = logging.StreamHandler()
-#logger.addHandler(console)
-#logger.setLevel(logging.INFO)
+logger.addHandler(console)
+logger.setLevel(logging.INFO)
 
 
 class BaseTrainer:
@@ -457,31 +457,31 @@ class BaseTrainer:
             metrics = {}
 
             epoch_train_loss, step_train_loss, epoch_train_mse = self.train_step(epoch)
-            for i in range(len(step_train_loss)):
-              batch_metrics = {"train_batch_loss":step_train_loss[i]}
-              self.callback_handler.on_log(
-                              self.training_config,
-                              batch_metrics,
-                              logger=logger,
-                              global_step=train_counter,
-                              rank=self.rank,
-                          )
-              train_counter = train_counter + 1
+            # for i in range(len(step_train_loss)):
+            #   batch_metrics = {"train_batch_loss":step_train_loss[i]}
+            #   self.callback_handler.on_log(
+            #                   self.training_config,
+            #                   batch_metrics,
+            #                   logger=logger,
+            #                   global_step=train_counter,
+            #                   rank=self.rank,
+            #               )
+            #   train_counter = train_counter + 1
             metrics["train_epoch_elbo"] = epoch_train_loss
             metrics["train_epoch_mse"] = epoch_train_mse
 
             if self.eval_dataset is not None:
                 epoch_eval_loss, batch_eval_loss, epoch_eval_mse = self.eval_step(epoch)
-                for i in range(len(batch_eval_loss)):
-                  batch_metrics = {"eval_batch_loss":batch_eval_loss[i]}
-                  self.callback_handler.on_log(
-                                  self.training_config,
-                                  batch_metrics,
-                                  logger=logger,
-                                  global_step=eval_counter,
-                                  rank=self.rank,
-                              )
-                  eval_counter = eval_counter + 1
+                # for i in range(len(batch_eval_loss)):
+                #   batch_metrics = {"eval_batch_loss":batch_eval_loss[i]}
+                #   self.callback_handler.on_log(
+                #                   self.training_config,
+                #                   batch_metrics,
+                #                   logger=logger,
+                #                   global_step=eval_counter,
+                #                   rank=self.rank,
+                #               )
+                #   eval_counter = eval_counter + 1
                 metrics["eval_epoch_loss"] = epoch_eval_loss
                 metrics["eval_epoch_mse"] = epoch_eval_mse
                 self._schedulers_step(epoch_eval_loss)
@@ -607,7 +607,7 @@ class BaseTrainer:
 
                 epoch_loss += loss.item()
                 epoch_mse += recon_loss.item()
-                batch_loss.append(loss.item())
+                # batch_loss.append(loss.item())
 
                 if epoch_loss != epoch_loss:
                     raise ArithmeticError("NaN detected in eval loss")
