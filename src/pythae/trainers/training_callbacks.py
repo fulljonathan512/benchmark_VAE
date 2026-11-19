@@ -207,7 +207,11 @@ class MetricConsolePrinterCallback(TrainingCallback):
 
         if logger is not None and (rank == -1 or rank == 0):
             epoch_train_loss = logs.get("train_epoch_loss", None)
+            epoch_kld_loss = logs.get("train_epoch_mse", None)
+            epoch_mse_loss = logs.get("train_epoch_kld", None)
             epoch_eval_loss = logs.get("eval_epoch_loss", None)
+            epoch_eval_kld = logs.get("eval_epoch_mse", None)
+            epoch_eval_mse = logs.get("eval_epoch_kld", None)
 
             # if epoch_train_loss is not None and epoch_eval_loss is not None:
             logger.info(
@@ -215,8 +219,16 @@ class MetricConsolePrinterCallback(TrainingCallback):
             )
             if epoch_train_loss is not None:
                 logger.info(f"Train loss: {np.round(epoch_train_loss, 4)}")
+            if epoch_train_loss is not None:
+                logger.info(f"Train kld: {np.round(epoch_kld_loss, 4)}")
+            if epoch_train_loss is not None:
+                logger.info(f"Train mse: {np.round(epoch_mse_loss, 4)}")
             if epoch_eval_loss is not None:
                 logger.info(f"Eval loss: {np.round(epoch_eval_loss, 4)}")
+            if epoch_eval_kld is not None:
+                logger.info(f"Eval kld: {np.round(epoch_eval_kld, 4)}")
+            if epoch_eval_mse is not None:
+                logger.info(f"Eval mse: {np.round(epoch_eval_mse, 4)}")
             logger.info(
                 "--------------------------------------------------------------------------"
             )

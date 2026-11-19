@@ -456,7 +456,7 @@ class BaseTrainer:
 
             metrics = {}
 
-            epoch_train_loss, step_train_loss, epoch_train_mse = self.train_step(epoch)
+            epoch_train_loss, kld_train_loss, epoch_train_mse = self.train_step(epoch)
             # for i in range(len(step_train_loss)):
             #   batch_metrics = {"train_batch_loss":step_train_loss[i]}
             #   self.callback_handler.on_log(
@@ -467,11 +467,12 @@ class BaseTrainer:
             #                   rank=self.rank,
             #               )
             #   train_counter = train_counter + 1
-            metrics["train_epoch_elbo"] = epoch_train_loss
+            metrics["train_epoch_loss"] = epoch_train_loss
+            metrics["train_epoch_kld"] = kld_train_loss
             metrics["train_epoch_mse"] = epoch_train_mse
 
             if self.eval_dataset is not None:
-                epoch_eval_loss, batch_eval_loss, epoch_eval_mse = self.eval_step(epoch)
+                epoch_eval_loss, kld_eval_loss, epoch_eval_mse = self.eval_step(epoch)
                 # for i in range(len(batch_eval_loss)):
                 #   batch_metrics = {"eval_batch_loss":batch_eval_loss[i]}
                 #   self.callback_handler.on_log(
@@ -483,6 +484,7 @@ class BaseTrainer:
                 #               )
                 #   eval_counter = eval_counter + 1
                 metrics["eval_epoch_loss"] = epoch_eval_loss
+                metrics["eval_epoch_loss"] = kld_eval_loss
                 metrics["eval_epoch_mse"] = epoch_eval_mse
                 self._schedulers_step(epoch_eval_loss)
 
@@ -659,6 +661,7 @@ class BaseTrainer:
 
             loss = model_output.loss
             recon_loss = model_output.recon_loss
+            kld_loss = model_output.reg_loss
             
             epoch_loss += loss.item()
             epoch_mse += recon_loss.item()
@@ -680,7 +683,7 @@ class BaseTrainer:
         epoch_loss /= len(self.train_loader)
         epoch_mse /= len(self.train_loader)
 
-        return epoch_loss, batch_loss, epoch_mse
+        return epoch_loss, kld_loss, epoch_mse
 
     def save_model(self, model: BaseAE, dir_path: str):
         """This method saves the final model along with the config files
