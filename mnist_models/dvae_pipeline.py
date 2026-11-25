@@ -57,36 +57,37 @@ def dvaeModels(train_data, eval_data, latent_dim, rec_loss, gauss_app, num_gauss
 
 def getDataset(folderpath):  
   # Ensure the dataset directory exists inside the container / project before saving
-  dataset_dir = Path(f"{absolute_path}/{folderpath}")
+  dataset_dir = Path(f"{absolute_path}")
 
   if not dataset_dir.exists():
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
   train_set = datasets.MNIST(
-    root="./data",
+    root=Path(f"{dataset_dir}/data"),
     train=True,
     download=True,
     transform=transforms.ToTensor()
   )
-  train_data = train_set.data/255
+  train_data = train_set.data[:60]/255
   
   eval_set = datasets.MNIST(
-    root="./data",
+    root=Path(f"{dataset_dir}/data"),
     train=False,
     download=True,
     transform=transforms.ToTensor()
   )
-  eval_data = eval_set.data/255
+  eval_data = eval_set.data[:6]/255
   
   return train_data, eval_data
   
 def main():
+  print(absolute_path)
   train_data, eval_data = getDataset("data/MNIST")
   
-  latent_dims = [2,3,4,5,6,7,8,16,32,64,128,256]
+  latent_dims = [2]#,3,4,5,6,7,8,16,32,64,128,256]
   rec_loss = ["mse"]
-  gaus_approxs = ["fib", "lcd"]
-  num_gauss_ps = [1,2,3,4,5,6,7,8,9,10]
+  gaus_approxs = ["fib"]#, "lcd"]
+  num_gauss_ps = [1]#,2,3,4,5,6,7,8,9,10]
   models = len(latent_dims) * len(rec_loss) * len(gaus_approxs) * len(num_gauss_ps)
   i = 1
   for ld in latent_dims:
